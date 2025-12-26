@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NCERT Science Learning Assistant</title>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+  background: white;
+  color: black;
+  padding: 24px;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 0;
+  background: black;
+  color: white;
+  padding: 16px 24px;
+  text-decoration: none;
+  font-size: 20px;
+  font-weight: bold;
+  border: 4px solid #fbbf24;
+  z-index: 100;
+}
+
+.skip-link:focus {
+  top: 16px;
+  left: 16px;
+}
+
+header {
+  margin-bottom: 40px;
+  padding-bottom: 24px;
+  border-bottom: 4px solid black;
+}
+
+h1 {
+  font-size: 48px;
+  font-weight: bold;
+  margin-bottom: 12px;
+}
+
+.subtitle {
+  font-size: 24px;
+  color: #374151;
+  margin-top: 8px;
+}
+
+.page-container {
+  position: relative;
+}
+
+.page {
+  display: none;
+}
+
+.page.active {
+  display: block;
+}
+
+.breadcrumb {
+  background: #111827;
+  color: white;
+  padding: 20px 32px;
+  border-radius: 8px;
+  margin-bottom: 32px;
+  font-size: 22px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 4px solid black;
+}
+
+.breadcrumb-arrow {
+  font-size: 28px;
+}
+
+.class-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-top: 32px;
+}
+
+.class-button {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  padding: 48px 32px;
+  font-size: 32px;
+  font-weight: bold;
+  border: 6px solid #1e40af;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.class-button:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(59, 130, 246, 0.4);
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+}
+
+.class-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 8px #fbbf24;
+}
+
+.class-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+}
+
+.control-section {
+  background: #f3f4f6;
+  padding: 24px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  border: 4px solid #1f2937;
+}
+
+.back-button, .help-button {
+  padding: 20px 32px;
+  font-size: 22px;
+  font-weight: bold;
+  border-radius: 8px;
+  border: 4px solid;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin-right: 16px;
+}
+
+.back-button {
+  background: #6b7280;
+  color: white;
+  border-color: #4b5563;
+}
+
+.back-button:hover {
+  background: #4b5563;
+}
+
+.help-button {
+  background: #10b981;
+  color: white;
+  border-color: #059669;
+}
+
+.help-button:hover {
+  background: #059669;
+}
+
+.back-button:focus, .help-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 8px #fbbf24;
+}
+
+.section {
+  background: #f3f4f6;
+  padding: 32px;
+  border-radius: 8px;
+  margin-bottom: 32px;
+  border: 4px solid #1f2937;
+}
+
+.section-dark {
+  background: black;
+  color: white;
+  border: 4px solid black;
+}
+
+.section-title {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+#status {
+  font-size: 26px;
+  line-height: 1.6;
+  font-weight: 600;
+}
+
+.voice-button {
+  width: 100%;
+  padding: 48px;
+  font-size: 28px;
+  font-weight: bold;
+  border-radius: 12px;
+  border: 6px solid;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  transition: all 0.3s;
+}
+
+.voice-button:not(.listening):not(:disabled) {
+  background: #f97316;
+  color: black;
+  border-color: #c2410c;
+}
+
+.voice-button:not(.listening):not(:disabled):hover {
+  background: #ea580c;
+  transform: scale(1.02);
+}
+
+.voice-button.listening {
+  background: #10b981;
+  color: white;
+  border-color: #059669;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+.voice-button:disabled {
+  background: #9ca3af;
+  color: #4b5563;
+  border-color: #6b7280;
+  cursor: not-allowed;
+}
+
+.voice-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 8px #fbbf24;
+}
+
+.button-hint {
+  text-align: center;
+  font-size: 22px;
+  color: #374151;
+  margin-top: 20px;
+  font-weight: 600;
+}
+
+.input-divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 32px 0;
+}
+
+.input-divider-line {
+  flex: 1;
+  height: 4px;
+  background: #1f2937;
+}
+
+.input-divider-text {
+  font-size: 24px;
+  font-weight: bold;
+  color: #374151;
+}
+
+.text-input-container {
+  display: flex;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.text-input {
+  flex: 1;
+  padding: 24px;
+  font-size: 26px;
+  border: 4px solid #1f2937;
+  border-radius: 8px;
+  background: white;
+  color: black;
+}
+
+.text-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 8px #fbbf24;
+}
+
+.text-submit-button {
+  padding: 24px 40px;
+  font-size: 26px;
+  font-weight: bold;
+  background: #10b981;
+  color: white;
+  border: 4px solid #059669;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.text-submit-button:hover:not(:disabled) {
+  background: #059669;
+}
+
+.text-submit-button:disabled {
+  background: #9ca3af;
+  color: #4b5563;
+  border-color: #6b7280;
+  cursor: not-allowed;
+}
+
+.text-submit-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 8px #fbbf24;
+}
+
+.conversation-box {
+  background: white;
+  padding: 32px;
+  border-radius: 8px;
+  border: 4px solid #1f2937;
+  margin-bottom: 24px;
+}
+
+.conversation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.conversation-label {
+  font-size: 26px;
+  font-weight: bold;
+  color: #111827;
+}
+
+.conversation-text {
+  font-size: 26px;
+  line-height: 1.8;
+  color: black;
+}
+
+.repeat-button {
+  padding: 16px 28px;
+  font-size: 22px;
+  font-weight: bold;
+  background: #f97316;
+  color: black;
+  border: 4px solid #c2410c;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s;
+}
+
+.repeat-button:hover {
+  background: #ea580c;
+}
+
+.repeat-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 8px #fbbf24;
+}
+
+.source-info {
+  font-size: 22px;
+  color: #3b82f6;
+  margin-top: 16px;
+  font-weight: 600;
+  padding: 16px;
+  background: #eff6ff;
+  border-radius: 6px;
+  border-left: 6px solid #3b82f6;
+}
+
+.slider-container {
+  margin-top: 16px;
+}
+
+.slider-label {
+  display: block;
+  font-size: 26px;
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 16px;
+}
+
+.slider {
+  width: 100%;
+  height: 20px;
+  background: #d1d5db;
+  border-radius: 10px;
+  outline: none;
+  cursor: pointer;
+  -webkit-appearance: none;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 40px;
+  height: 40px;
+  background: #f97316;
+  border: 4px solid #c2410c;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 40px;
+  height: 40px;
+  background: #f97316;
+  border: 4px solid #c2410c;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.slider:focus {
+  box-shadow: 0 0 0 8px #fbbf24;
+}
+
+.shortcuts-list {
+  list-style: none;
+  font-size: 22px;
+  line-height: 2;
+}
+
+.shortcuts-list li {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 6px;
+}
+
+.shortcuts-list strong {
+  font-size: 26px;
+  color: #fbbf24;
+}
+
+.icon {
+  width: 44px;
+  height: 44px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.hidden {
+  display: none;
+}
+
+audio {
+  width: 100%;
+  margin-top: 16px;
+  height: 60px;
+}
+
+.welcome-message {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  padding: 32px;
+  border-radius: 12px;
+  margin-bottom: 32px;
+  border: 6px solid #1e40af;
+}
+
+.welcome-message h2 {
+  font-size: 36px;
+  margin-bottom: 16px;
+}
+
+.welcome-message p {
+  font-size: 24px;
+  line-height: 1.8;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.conversation-count {
+  font-size: 22px;
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.chat-history {
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 4px solid #e5e7eb;
+}
+
+.chat-message {
+  margin-bottom: 24px;
+  padding: 24px;
+  border-radius: 8px;
+  border: 3px solid;
+  position: relative;
+  cursor: pointer;
+}
+
+.chat-message:focus {
+  outline: none;
+  box-shadow: 0 0 0 8px #fbbf24;
+  transform: scale(1.02);
+}
+
+.chat-message-user {
+  background: #eff6ff;
+  border-color: #3b82f6;
+  margin-left: 48px;
+}
+
+.chat-message-assistant {
+  background: white;
+  border-color: #1f2937;
+  margin-right: 48px;
+}
+
+.chat-message-label {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.chat-message-text {
+  font-size: 24px;
+  line-height: 1.8;
+  color: #1f2937;
+  word-wrap: break-word;
+}
+
+.chat-message-meta {
+  font-size: 18px;
+  color: #6b7280;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 2px solid #e5e7eb;
+}
+
+.chat-source {
+  font-size: 20px;
+  color: #3b82f6;
+  margin-top: 12px;
+  font-weight: 600;
+  padding: 12px;
+  background: #eff6ff;
+  border-radius: 6px;
+  border-left: 4px solid #3b82f6;
+}
+
+.welcome-chat-message {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  padding: 24px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  border: 4px solid #1e40af;
+}
+
+.welcome-chat-message .chat-message-text {
+  color: white;
+  font-size: 22px;
+}
+
+.input-section {
+  background: white;
+  box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+  margin-top: 24px;
+}
+
+.input-controls {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.voice-button-compact {
+  padding: 20px 28px;
+  font-size: 20px;
+  font-weight: bold;
+  border-radius: 8px;
+  border: 4px solid;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+  background: #f97316;
+  color: black;
+  border-color: #c2410c;
+}
+
+.voice-button-compact:hover:not(:disabled) {
+  background: #ea580c;
+}
+
+.voice-button-compact.listening {
+  background: #10b981;
+  color: white;
+  border-color: #059669;
+  animation: pulse 2s infinite;
+}
+
+.voice-button-compact:disabled {
+  background: #9ca3af;
+  color: #4b5563;
+  border-color: #6b7280;
+  cursor: not-allowed;
+}
+
+.voice-button-compact:focus {
+  outline: none;
+  box-shadow: 0 0 0 8px #fbbf24;
+}
+
+.text-input-wrapper {
+  flex: 1;
+  display: flex;
+  gap: 12px;
+}
+
+.text-input-compact {
+  flex: 1;
+  padding: 20px;
+  font-size: 22px;
+  border: 4px solid #1f2937;
+  border-radius: 8px;
+  background: white;
+  color: black;
+}
+
+.text-input-compact:focus {
+  outline: none;
+  box-shadow: 0 0 0 8px #fbbf24;
+}
+
+.text-submit-button-compact {
+  padding: 20px 32px;
+  font-size: 20px;
+  font-weight: bold;
+  background: #10b981;
+  color: white;
+  border: 4px solid #059669;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.text-submit-button-compact:hover:not(:disabled) {
+  background: #059669;
+}
+
+.text-submit-button-compact:disabled {
+  background: #9ca3af;
+  color: #4b5563;
+  border-color: #6b7280;
+  cursor: not-allowed;
+}
+
+.text-submit-button-compact:focus {
+  outline: none;
+  box-shadow: 0 0 0 8px #fbbf24;
+}
+
+.settings-section, .shortcuts-section {
+  margin-top: 16px;
+}
+
+.settings-toggle {
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.settings-toggle:hover {
+  opacity: 0.8;
+}
+
+.settings-content {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 2px solid rgba(255,255,255,0.2);
+}
+
+details[open] .settings-toggle::after {
+  content: ' (Click to collapse)';
+  font-size: 18px;
+  color: #9ca3af;
+  font-weight: normal;
+}
+</style>
+
+</head>
+<body>
+<div class="container">
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+
+  <header>
+    <h1>NCERT Science Learning Assistant</h1>
+    <p class="subtitle">Your AI-powered study companion for Science</p>
+  </header>
+
+  <main id="main-content">
+    <div id="breadcrumb" class="breadcrumb hidden" role="navigation" aria-label="Current location">
+      <span id="breadcrumbText">Home</span>
+    </div>
+
+    <!-- PAGE 1: Class Selection -->
+    <div id="classSelectionPage" class="page active">
+      <div class="welcome-message">
+        <h2>Welcome to Your Learning Assistant! 🎓</h2>
+        <p>Click on a class to start learning science. You can ask questions and get answers from your textbook.</p>
+      </div>
+
+      <div class="control-section">
+        <button id="classHelpButton" class="help-button" aria-label="Get help. Press Control H">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <span>HELP (Ctrl+H)</span>
+        </button>
+      </div>
+
+      <div class="class-grid" role="list" aria-label="Select your class">
+        <button id="class6Button" class="class-button" aria-label="Class 6 Science. Click to start">
+          <span>Class 6 Science</span>
+        </button>
+      </div>
+
+      <div class="class-grid" role="list" aria-label="Select your class">
+        <button id="class7Button" class="class-button" aria-label="Class 7 Science. Click to start">
+          <span>Class 7 Science</span>
+        </button>
+      </div>
+
+      <div class="class-grid" role="list" aria-label="Select your class">
+        <button id="class9Button" class="class-button" aria-label="Class 9 Science. Click to start">
+          <span>Class 9 Science</span>
+        </button>
+      </div>
+      
+    </div>
+
+    <!-- PAGE 2: Assistant -->
+    <div id="assistantPage" class="page">
+      <div class="control-section">
+        <button id="backToClassButton" class="back-button" aria-label="Go back to class selection. Press Escape">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+          </svg>
+          <span>BACK TO HOME (Esc)</span>
+        </button>
+        <button id="clearChatButton" class="help-button" aria-label="Clear chat history. Press Control Delete">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+          </svg>
+          <span>CLEAR CHAT (Ctrl+Del)</span>
+        </button>
+        <button id="assistantHelpButton" class="help-button" aria-label="Get help. Press Control H">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <span>HELP (Ctrl+H)</span>
+        </button>
+      </div>
+
+      <div class="section section-dark" role="region" aria-label="System Status" aria-live="polite">
+        <div class="section-title">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
+          </svg>
+          <span>Status</span>
+        </div>
+        <p id="status">Loading models...</p>
+      </div>
+
+      <!-- Chat History Section -->
+      <div class="section" role="region" aria-label="Chat History">
+        <div class="section-header">
+          <h2 class="section-title">Conversation History</h2>
+          <p class="conversation-count" id="conversationCount" aria-live="polite">0 messages</p>
+        </div> 
+
+        <div id="chatHistory" class="chat-history" role="log" aria-live="polite" aria-atomic="false" aria-relevant="additions">
+          <div class="welcome-chat-message" tabindex="0" role="article" aria-label="Welcome message: Welcome! Ask me any question about your science textbook. I can help you understand concepts, explain diagrams, and answer follow-up questions.">
+            <p class="chat-message-text" aria-hidden="true">👋 Welcome! Ask me any question about your science textbook. I can help you understand concepts, explain diagrams, and answer follow-up questions.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input Section -->
+      <div class="section input-section" aria-label="Ask a question">
+        <h2 class="section-title">Ask Your Question</h2>
+        
+        <div class="input-controls">
+          <button id="voiceButton" class="voice-button-compact" disabled aria-label="Record voice question. Press Space">
+            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+            </svg>
+            <span id="buttonText">RECORD (Space)</span>
+          </button>
+
+          <div class="text-input-wrapper">
+            <label for="textInput" class="sr-only">Type your question here</label>
+            <input 
+              type="text" 
+              id="textInput" 
+              class="text-input-compact" 
+              placeholder="Type your question or press Space to speak..."
+              aria-label="Type your question"
+              disabled
+            >
+            <button id="textSubmit" class="text-submit-button-compact" aria-label="Submit question. Press Enter" disabled>
+              <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+              </svg>
+              <span>SEND</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings collapsed -->
+      <details class="section settings-section">
+        <summary class="section-title settings-toggle" aria-label="Settings. Click to expand">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+          Settings
+        </summary>
+        <div class="settings-content">
+          <div class="slider-container">
+            <label for="speechRate" class="slider-label">Speech Rate: <span id="rateValue">1.0</span>x</label>
+            <input 
+              type="range" 
+              id="speechRate" 
+              class="slider" 
+              min="0.5" 
+              max="2.0" 
+              step="0.1" 
+              value="1.0"
+              aria-label="Adjust speech rate from 0.5 to 2.0 times normal speed"
+            >
+          </div>
+        </div>
+      </details>
+
+      <!-- Keyboard shortcuts collapsed -->
+      <details class="section section-dark shortcuts-section">
+        <summary class="section-title settings-toggle" aria-label="Keyboard shortcuts. Click to expand">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+          </svg>
+          Keyboard Shortcuts
+        </summary>
+        <ul class="shortcuts-list">
+          <li><strong>Space:</strong> Start/stop voice recording</li>
+          <li><strong>Enter:</strong> Submit text question</li>
+          <li><strong>Control + R:</strong> Repeat last message</li>
+          <li><strong>Control + Delete:</strong> Clear chat history</li>
+          <li><strong>Escape:</strong> Return to home</li>
+          <li><strong>Control + H:</strong> Hear help</li>
+        </ul>
+      </details>
+      
+      <audio id="audio" controls style="display:none" aria-label="Audio playback"></audio>
+    </div>
+  </main>
+</div>
+
+<div id="announcer" role="status" aria-live="polite" aria-atomic="true" class="sr-only"></div>
+
+<script src="app.js"></script>
+</body>
+</html
