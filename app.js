@@ -95,19 +95,25 @@ async function announceStatus(message, speak = false) {
 
 async function speakText(text) {
   try {
-    // Split text into sentences for streaming
-    const sentences = text.match(/[^.!?]+[.!?]+(?=\s|$)/g) || [text];
+    const sentences = text
+      .replace(/(\d+)\.\s*(\d+)/g, '$1DECIMALDOT$2') // Protect decimal numbers
+      .replace(/(\d+)\.\s+/g, '$1LISTDOT ') // Protect numbered lists
+      .match(/[^.!?]+[.!?]+(?=\s|$)/g) || [text];
     
-    for (const sentence of sentences) {
-      const trimmed = sentence.trim();
-      if (trimmed.length > 0) {
-        await queueSentenceForTTS(trimmed);
+    for (let sentence of sentences) {
+      // Restore protected decimals and list numbers
+      sentence = sentence
+        .replace(/DECIMALDOT/g, '.')
+        .replace(/LISTDOT/g, '.')
+        .trim();
+      
+      if (sentence.length > 0) {
+        await queueSentenceForTTS(sentence);
       }
     }
     
   } catch (err) {
     console.error('TTS error:', err);
-    // Fallback to browser speech synthesis
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.rate = parseFloat(speechRateSlider.value);
     speechSynthesis.speak(utterance);
