@@ -48,6 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
     await initModels();
   }
 
+  
   async function showAssistantPage7() {
     selectedBookJSON = 'NCERT7thbook.json';
     classSelectionPage.classList.remove('active');
