@@ -1,6 +1,5 @@
 // API Configuration
 const API_BASE_URL = 'https://c64fe879a391.ngrok-free.app/api';
-
 // DOM Elements
 const classSelectionPage = document.getElementById('classSelectionPage');
 const assistantPage = document.getElementById('assistantPage');
