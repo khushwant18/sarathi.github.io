@@ -36,6 +36,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const class6Button = document.getElementById('class6Button');
   const class7Button = document.getElementById('class7Button');
   const class9Button = document.getElementById('class9Button');
+  const class10Button = document.getElementById('class10Button');
   const backToClassButton = document.getElementById('backToClassButton');
   
   async function showAssistantPage6() {
@@ -64,6 +65,14 @@ document.addEventListener('DOMContentLoaded', function() {
     breadcrumbText.textContent = 'Home → Class 9 Science';
     await initModels();
   }
+  async function showAssistantPage10() {
+    selectedBookJSON = 'NCERT10thbook.json';
+    classSelectionPage.classList.remove('active');
+    assistantPage.classList.add('active');
+    breadcrumb.classList.remove('hidden');
+    breadcrumbText.textContent = 'Home → Class 10 Science';
+    await initModels();
+  }
   
   function showClassSelectionPage() {
     assistantPage.classList.remove('active');
@@ -74,6 +83,7 @@ document.addEventListener('DOMContentLoaded', function() {
   if (class6Button) class6Button.addEventListener('click', showAssistantPage6);
   if (class7Button) class7Button.addEventListener('click', showAssistantPage7);
   if (class9Button) class9Button.addEventListener('click', showAssistantPage9);
+  if (class10Button) class10Button.addEventListener('click', showAssistantPage10);
   if (backToClassButton) backToClassButton.addEventListener('click', showClassSelectionPage);
 });
 
