@@ -48,6 +48,11 @@ header {
   margin-bottom: 24px;
   padding-bottom: 16px;
   border-bottom: 3px solid black;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
 }
 
 h1 {
@@ -61,6 +66,38 @@ h1 {
   font-size: clamp(18px, 4vw, 24px);
   color: #374151;
   margin-top: 8px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.user-name {
+  font-size: clamp(18px, 4vw, 22px);
+  font-weight: 600;
+  color: #111827;
+}
+
+.logout-button {
+  padding: 12px 20px;
+  font-size: clamp(16px, 3vw, 18px);
+  font-weight: bold;
+  background: #ef4444;
+  color: white;
+  border: 3px solid #dc2626;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.logout-button:hover,
+.logout-button:focus {
+  background: #dc2626;
+  outline: 4px solid #fbbf24;
+  outline-offset: 2px;
 }
 
 .page-container {
@@ -92,6 +129,119 @@ h1 {
 
 .breadcrumb-arrow {
   font-size: clamp(20px, 5vw, 28px);
+}
+
+.auth-container {
+  max-width: 500px;
+  margin: 40px auto;
+  background: #f3f4f6;
+  padding: 32px;
+  border-radius: 12px;
+  border: 3px solid #1f2937;
+}
+
+.auth-title {
+  font-size: clamp(28px, 6vw, 36px);
+  font-weight: bold;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  font-size: clamp(18px, 4vw, 22px);
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #111827;
+}
+
+.form-input {
+  width: 100%;
+  padding: 16px;
+  font-size: clamp(18px, 4vw, 22px);
+  border: 3px solid #1f2937;
+  border-radius: 8px;
+  background: white;
+  color: black;
+}
+
+.form-input:focus {
+  outline: 4px solid #fbbf24;
+  outline-offset: 2px;
+}
+
+.auth-button {
+  width: 100%;
+  padding: 18px;
+  font-size: clamp(20px, 4vw, 24px);
+  font-weight: bold;
+  background: #3b82f6;
+  color: white;
+  border: 3px solid #2563eb;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 20px;
+}
+
+.auth-button:hover:not(:disabled),
+.auth-button:focus:not(:disabled) {
+  background: #2563eb;
+  outline: 4px solid #fbbf24;
+  outline-offset: 2px;
+}
+
+.auth-button:disabled {
+  background: #9ca3af;
+  border-color: #6b7280;
+  cursor: not-allowed;
+}
+
+.auth-switch {
+  text-align: center;
+  margin-top: 20px;
+  font-size: clamp(18px, 4vw, 20px);
+}
+
+.auth-switch button {
+  background: none;
+  border: none;
+  color: #3b82f6;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: inherit;
+  font-weight: 600;
+}
+
+.auth-switch button:hover,
+.auth-switch button:focus {
+  color: #2563eb;
+  outline: 2px solid #fbbf24;
+  outline-offset: 2px;
+}
+
+.error-message {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  font-size: clamp(16px, 3vw, 18px);
+  border: 2px solid #ef4444;
+}
+
+.success-message {
+  background: #d1fae5;
+  color: #065f46;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  font-size: clamp(16px, 3vw, 18px);
+  border: 2px solid #10b981;
 }
 
 .class-grid {
@@ -126,21 +276,8 @@ h1 {
   transform: translateY(-2px);
   box-shadow: 0 8px 16px rgba(59, 130, 246, 0.4);
   background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-}
-
-.class-button:focus {
   outline: 4px solid #fbbf24;
   outline-offset: 2px;
-}
-
-.class-button::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
 }
 
 .control-section {
@@ -161,7 +298,7 @@ h1 {
   }
 }
 
-.back-button, .help-button {
+.back-button, .help-button, .new-chat-button {
   padding: 16px 24px;
   font-size: clamp(18px, 4vw, 22px);
   font-weight: bold;
@@ -178,7 +315,7 @@ h1 {
 }
 
 @media (min-width: 640px) {
-  .back-button, .help-button {
+  .back-button, .help-button, .new-chat-button {
     width: auto;
     flex: 1;
     min-width: 200px;
@@ -194,6 +331,8 @@ h1 {
 .back-button:hover,
 .back-button:focus {
   background: #4b5563;
+  outline: 4px solid #fbbf24;
+  outline-offset: 2px;
 }
 
 .help-button {
@@ -205,9 +344,19 @@ h1 {
 .help-button:hover,
 .help-button:focus {
   background: #059669;
+  outline: 4px solid #fbbf24;
+  outline-offset: 2px;
 }
 
-.back-button:focus, .help-button:focus {
+.new-chat-button {
+  background: #8b5cf6;
+  color: white;
+  border-color: #7c3aed;
+}
+
+.new-chat-button:hover,
+.new-chat-button:focus {
+  background: #7c3aed;
   outline: 4px solid #fbbf24;
   outline-offset: 2px;
 }
@@ -274,6 +423,8 @@ h1 {
 .voice-button:not(.listening):not(:disabled):focus {
   background: #ea580c;
   transform: scale(1.02);
+  outline: 4px solid #fbbf24;
+  outline-offset: 2px;
 }
 
 .voice-button.listening {
@@ -293,38 +444,6 @@ h1 {
   color: #4b5563;
   border-color: #6b7280;
   cursor: not-allowed;
-}
-
-.voice-button:focus {
-  outline: 4px solid #fbbf24;
-  outline-offset: 2px;
-}
-
-.button-hint {
-  text-align: center;
-  font-size: clamp(18px, 4vw, 22px);
-  color: #374151;
-  margin-top: 16px;
-  font-weight: 600;
-}
-
-.input-divider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 24px 0;
-}
-
-.input-divider-line {
-  flex: 1;
-  height: 3px;
-  background: #1f2937;
-}
-
-.input-divider-text {
-  font-size: clamp(20px, 4vw, 24px);
-  font-weight: bold;
-  color: #374151;
 }
 
 .text-input-container {
@@ -376,6 +495,8 @@ h1 {
 .text-submit-button:hover:not(:disabled),
 .text-submit-button:focus:not(:disabled) {
   background: #059669;
+  outline: 4px solid #fbbf24;
+  outline-offset: 2px;
 }
 
 .text-submit-button:disabled {
@@ -383,11 +504,6 @@ h1 {
   color: #4b5563;
   border-color: #6b7280;
   cursor: not-allowed;
-}
-
-.text-submit-button:focus {
-  outline: 4px solid #fbbf24;
-  outline-offset: 2px;
 }
 
 .conversation-box {
@@ -419,32 +535,6 @@ h1 {
   color: black;
   word-wrap: break-word;
   overflow-wrap: break-word;
-}
-
-.repeat-button {
-  padding: 14px 24px;
-  font-size: clamp(18px, 4vw, 22px);
-  font-weight: bold;
-  background: #f97316;
-  color: black;
-  border: 3px solid #c2410c;
-  border-radius: 8px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  transition: all 0.2s;
-  min-height: 48px;
-}
-
-.repeat-button:hover,
-.repeat-button:focus {
-  background: #ea580c;
-}
-
-.repeat-button:focus {
-  outline: 4px solid #fbbf24;
-  outline-offset: 2px;
 }
 
 .source-info {
@@ -598,6 +688,8 @@ audio {
   background: #f9fafb;
   border-radius: 8px;
   border: 3px solid #e5e7eb;
+  max-height: 500px;
+  overflow-y: auto;
 }
 
 @media (min-width: 640px) {
@@ -612,7 +704,6 @@ audio {
   border-radius: 8px;
   border: 3px solid;
   position: relative;
-  cursor: pointer;
 }
 
 @media (min-width: 640px) {
@@ -752,6 +843,8 @@ audio {
 .voice-button-compact:hover:not(:disabled),
 .voice-button-compact:focus:not(:disabled) {
   background: #ea580c;
+  outline: 4px solid #fbbf24;
+  outline-offset: 2px;
 }
 
 .voice-button-compact.listening {
@@ -766,11 +859,6 @@ audio {
   color: #4b5563;
   border-color: #6b7280;
   cursor: not-allowed;
-}
-
-.voice-button-compact:focus {
-  outline: 4px solid #fbbf24;
-  outline-offset: 2px;
 }
 
 .text-input-wrapper {
@@ -832,6 +920,8 @@ audio {
 .text-submit-button-compact:hover:not(:disabled),
 .text-submit-button-compact:focus:not(:disabled) {
   background: #059669;
+  outline: 4px solid #fbbf24;
+  outline-offset: 2px;
 }
 
 .text-submit-button-compact:disabled {
@@ -839,11 +929,6 @@ audio {
   color: #4b5563;
   border-color: #6b7280;
   cursor: not-allowed;
-}
-
-.text-submit-button-compact:focus {
-  outline: 4px solid #fbbf24;
-  outline-offset: 2px;
 }
 
 .settings-section, .shortcuts-section {
@@ -874,6 +959,59 @@ details[open] .settings-toggle::after {
   font-size: clamp(16px, 3vw, 18px);
   color: #9ca3af;
   font-weight: normal;
+}
+
+.chat-sessions-sidebar {
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 3px solid #e5e7eb;
+  padding: 16px;
+  margin-bottom: 20px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.chat-session-item {
+  padding: 14px;
+  background: white;
+  border: 2px solid #d1d5db;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.chat-session-item:hover,
+.chat-session-item:focus {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  outline: 2px solid #fbbf24;
+  outline-offset: 2px;
+}
+
+.chat-session-item.active {
+  border-color: #3b82f6;
+  background: #eff6ff;
+  border-width: 3px;
+}
+
+.chat-session-title {
+  font-size: clamp(18px, 4vw, 20px);
+  font-weight: 600;
+  color: #111827;
+  margin-bottom: 6px;
+}
+
+.chat-session-meta {
+  font-size: clamp(14px, 3vw, 16px);
+  color: #6b7280;
+}
+
+.no-sessions {
+  text-align: center;
+  padding: 20px;
+  color: #6b7280;
+  font-size: clamp(16px, 3vw, 18px);
 }
 
 /* Touch-friendly adjustments */
@@ -913,15 +1051,20 @@ details[open] .settings-toggle::after {
   }
 }
 </style>
-
 </head>
 <body>
 <div class="container">
   <a href="#main-content" class="skip-link">Skip to main content</a>
 
   <header>
-    <h1>Vidya Assist</h1>
-    <p class="subtitle">Your AI-powered study companion for Science</p>
+    <div>
+      <h1>Vidya Assist</h1>
+      <p class="subtitle">Your AI-powered study companion for Science</p>
+    </div>
+    <div id="userInfoContainer" class="user-info hidden">
+      <span class="user-name" id="userName" aria-live="polite">Welcome!</span>
+      <button id="logoutButton" class="logout-button" aria-label="Logout">LOGOUT</button>
+    </div>
   </header>
 
   <main id="main-content">
@@ -929,8 +1072,42 @@ details[open] .settings-toggle::after {
       <span id="breadcrumbText">Home</span>
     </div>
 
+    <!-- PAGE 0: Login/Register -->
+    <div id="authPage" class="page active">
+      <div class="auth-container">
+        <h2 class="auth-title" id="authTitle">Login to Vidya Assist</h2>
+        
+        <div id="authError" class="error-message hidden" role="alert" aria-live="assertive"></div>
+        <div id="authSuccess" class="success-message hidden" role="alert" aria-live="polite"></div>
+        
+        <form id="authForm" aria-label="Authentication form">
+          <div id="nameField" class="form-group hidden">
+            <label for="nameInput" class="form-label">Full Name</label>
+            <input type="text" id="nameInput" class="form-input" placeholder="Enter your full name" aria-required="true">
+          </div>
+          
+          <div class="form-group">
+            <label for="emailInput" class="form-label">Email Address</label>
+            <input type="email" id="emailInput" class="form-input" placeholder="Enter your email" required aria-required="true">
+          </div>
+          
+          <div class="form-group">
+            <label for="passwordInput" class="form-label">Password</label>
+            <input type="password" id="passwordInput" class="form-input" placeholder="Enter your password" required aria-required="true">
+          </div>
+          
+          <button type="submit" id="authSubmitBtn" class="auth-button">LOGIN</button>
+        </form>
+        
+        <div class="auth-switch">
+          <span id="authSwitchText">Don't have an account?</span>
+          <button type="button" id="authSwitchBtn">Register here</button>
+        </div>
+      </div>
+    </div>
+
     <!-- PAGE 1: Class Selection -->
-    <div id="classSelectionPage" class="page active">
+    <div id="classSelectionPage" class="page">
       <div class="welcome-message">
         <h2>Welcome to Your Learning Assistant! 🎓</h2>
         <p>Click on a class to start learning science. You can ask questions and get answers from your textbook.</p>
@@ -973,7 +1150,13 @@ details[open] .settings-toggle::after {
           </svg>
           <span>BACK TO HOME (Esc)</span>
         </button>
-        <button id="clearChatButton" class="help-button" aria-label="Clear chat history. Press Control Delete">
+        <button id="newChatButton" class="new-chat-button" aria-label="Start a new chat session. Press Control N">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          <span>NEW CHAT (Ctrl+N)</span>
+        </button>
+        <button id="clearChatButton" class="help-button" aria-label="Clear current chat. Press Control Delete">
           <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
           </svg>
@@ -991,103 +1174,118 @@ details[open] .settings-toggle::after {
         <div class="section-title">
           <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
-</svg>
-<span>Status</span>
-</div>
-<p id="status">Loading models...</p>
-</div>
-<!-- Chat History Section -->
-  <div class="section" role="region" aria-label="Chat History">
-    <div class="section-header">
-      <h2 class="section-title">Conversation History</h2>
-      <p class="conversation-count" id="conversationCount" aria-live="polite">0 messages</p>
-    </div> 
-
-    <div id="chatHistory" class="chat-history" role="log" aria-live="polite" aria-atomic="false" aria-relevant="additions">
-      <div class="welcome-chat-message" tabindex="0" role="article" aria-label="Welcome message: Welcome! Ask me any question about your science textbook. I can help you understand concepts, explain diagrams, and answer follow-up questions.">
-        <p class="chat-message-text" aria-hidden="true">👋 Welcome! Ask me any question about your science textbook. I can help you understand concepts, explain diagrams, and answer follow-up questions.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Input Section -->
-  <div class="section input-section" aria-label="Ask a question">
-    <h2 class="section-title">Ask Your Question</h2>
-    
-    <div class="input-controls">
-      <button id="voiceButton" class="voice-button-compact" disabled aria-label="Record voice question. Press Space">
-        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
-        </svg>
-        <span id="buttonText">RECORD (Space)</span>
-      </button>
-
-      <div class="text-input-wrapper">
-        <label for="textInput" class="sr-only">Type your question here</label>
-        <input 
-          type="text" 
-          id="textInput" 
-          class="text-input-compact" 
-          placeholder="Type your question or press Space to speak..."
-          aria-label="Type your question"
-          disabled
-        >
-        <button id="textSubmit" class="text-submit-button-compact" aria-label="Submit question. Press Enter" disabled>
-          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
           </svg>
-          <span>SEND</span>
-        </button>
+          <span>Status</span>
+        </div>
+        <p id="status">Ready</p>
       </div>
-    </div>
-  </div>
 
-  <!-- Settings collapsed -->
-  <details class="section settings-section">
-    <summary class="section-title settings-toggle" aria-label="Settings. Click to expand">
-      <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-      </svg>
-      Settings
-    </summary>
-    <div class="settings-content">
-      <div class="slider-container">
-        <label for="speechRate" class="slider-label">Speech Rate: <span id="rateValue">1.0</span>x</label>
-        <input 
-          type="range" 
-          id="speechRate" 
-          class="slider" 
-          min="0.5" 
-          max="2.0" 
-          step="0.1" 
-          value="1.0"
-          aria-label="Adjust speech rate from 0.5 to 2.0 times normal speed"
-        >
+      <!-- Chat Sessions Sidebar -->
+      <details class="section" open>
+        <summary class="section-title settings-toggle" aria-label="Chat sessions. Click to collapse">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+          </svg>
+          Chat Sessions
+        </summary>
+        <div id="chatSessionsSidebar" class="chat-sessions-sidebar" role="list" aria-label="Your chat sessions">
+          <div class="no-sessions">No chat sessions yet. Click "NEW CHAT" to start!</div>
+        </div>
+      </details>
+
+      <!-- Chat History Section -->
+      <div class="section" role="region" aria-label="Chat History">
+        <div class="section-header">
+          <h2 class="section-title">Conversation History</h2>
+          <p class="conversation-count" id="conversationCount" aria-live="polite">0 messages</p>
+        </div> 
+
+        <div id="chatHistory" class="chat-history" role="log" aria-live="polite" aria-atomic="false" aria-relevant="additions">
+          <div class="welcome-chat-message" tabindex="0" role="article" aria-label="Welcome message">
+            <p class="chat-message-text" aria-hidden="true">👋 Welcome! Ask me any question about your science textbook. I can help you understand concepts, explain diagrams, and answer follow-up questions.</p>
+          </div>
+        </div>
       </div>
-    </div>
-  </details>
 
-  <!-- Keyboard shortcuts collapsed -->
-  <details class="section section-dark shortcuts-section">
-    <summary class="section-title settings-toggle" aria-label="Keyboard shortcuts. Click to expand">
-      <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
-      </svg>
-      Keyboard Shortcuts
-    </summary>
-    <ul class="shortcuts-list">
-      <li><strong>Space:</strong> Start/stop voice recording</li>
-      <li><strong>Enter:</strong> Submit text question</li>
-      <li><strong>Control + R:</strong> Repeat last message</li>
-      <li><strong>Control + Delete:</strong> Clear chat history</li>
-      <li><strong>Escape:</strong> Return to home</li>
-      <li><strong>Control + H:</strong> Hear help</li>
-    </ul>
-  </details>
-  
-  <audio id="audio" controls style="display:none" aria-label="Audio playback"></audio>
-</div>
+      <!-- Input Section -->
+      <div class="section input-section" aria-label="Ask a question">
+        <h2 class="section-title">Ask Your Question</h2>
+        
+        <div class="input-controls">
+          <button id="voiceButton" class="voice-button-compact" disabled aria-label="Record voice question. Press Space">
+            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/>
+            </svg>
+            <span id="buttonText">RECORD (Space)</span>
+          </button>
+
+          <div class="text-input-wrapper">
+            <label for="textInput" class="sr-only">Type your question here</label>
+            <input 
+              type="text" 
+              id="textInput" 
+              class="text-input-compact" 
+              placeholder="Type your question or press Space to speak..."
+              aria-label="Type your question"
+              disabled
+            >
+            <button id="textSubmit" class="text-submit-button-compact" aria-label="Submit question. Press Enter" disabled>
+              <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+              </svg>
+              <span>SEND</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings collapsed -->
+      <details class="section settings-section">
+        <summary class="section-title settings-toggle" aria-label="Settings. Click to expand">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+          Settings
+        </summary>
+        <div class="settings-content">
+          <div class="slider-container">
+            <label for="speechRate" class="slider-label">Speech Rate: <span id="rateValue">1.0</span>x</label>
+            <input 
+              type="range" 
+              id="speechRate" 
+              class="slider" 
+              min="0.5" 
+              max="2.0" 
+              step="0.1" 
+              value="1.0"
+              aria-label="Adjust speech rate from 0.5 to 2.0 times normal speed"
+            >
+          </div>
+        </div>
+      </details>
+
+      <!-- Keyboard shortcuts collapsed -->
+      <details class="section section-dark shortcuts-section">
+        <summary class="section-title settings-toggle" aria-label="Keyboard shortcuts. Click to expand">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/>
+          </svg>
+          Keyboard Shortcuts
+        </summary>
+        <ul class="shortcuts-list">
+          <li><strong>Space:</strong> Start/stop voice recording</li>
+          <li><strong>Enter:</strong> Submit text question</li>
+          <li><strong>Control + N:</strong> Start new chat session</li>
+          <li><strong>Control + R:</strong> Repeat last message</li>
+          <li><strong>Control + Delete:</strong> Clear current chat</li>
+          <li><strong>Escape:</strong> Return to home</li>
+          <li><strong>Control + H:</strong> Hear help</li>
+        </ul>
+      </details>
+      
+      <audio id="audio" controls style="display:none" aria-label="Audio playback"></audio>
+    </div>
 
   </main>
 </div>
