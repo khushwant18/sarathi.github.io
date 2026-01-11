@@ -274,11 +274,11 @@ async function loadChatSessions() {
     const response = await fetch(`${API_BASE_URL}/chat/sessions`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${authToken}`
+        'Authorization': `Bearer ${authToken}`,
+        'ngrok-skip-browser-warning': 'true'  // ADD THIS
       }
     });
     
-    // Check if response is HTML (error page)
     const contentType = response.headers.get('content-type');
     if (!contentType || !contentType.includes('application/json')) {
       console.error('Server returned non-JSON response');
@@ -293,12 +293,9 @@ async function loadChatSessions() {
       allChatSessions = data.sessions.filter(s => s.book === selectedBookJSON);
       renderChatSessions();
       
-      // Load most recent session if available
       if (allChatSessions.length > 0 && !currentSessionId) {
         await loadChatSession(allChatSessions[0].id);
       }
-    } else {
-      console.error('Error from server:', data.message);
     }
     
   } catch (err) {
