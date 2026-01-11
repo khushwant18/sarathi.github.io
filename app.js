@@ -182,7 +182,8 @@ async function verifyAuth() {
     const response = await fetch(`${API_BASE_URL}/auth/verify`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${token}`
+        'Authorization': `Bearer ${token}`,
+        'ngrok-skip-browser-warning': 'true'
       }
     });
     
@@ -209,7 +210,8 @@ async function handleLogout() {
     await fetch(`${API_BASE_URL}/auth/logout`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${authToken}`
+        'Authorization': `Bearer ${authToken}`,
+        'ngrok-skip-browser-warning': 'true'
       }
     });
   } catch (err) {
@@ -275,7 +277,7 @@ async function loadChatSessions() {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${authToken}`,
-        'ngrok-skip-browser-warning': 'true'  // ADD THIS
+        'ngrok-skip-browser-warning': 'true'  
       }
     });
     
@@ -353,7 +355,8 @@ async function loadChatSession(sessionId) {
     const response = await fetch(`${API_BASE_URL}/chat/session/${sessionId}`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${authToken}`
+        'Authorization': `Bearer ${authToken}`,
+        'ngrok-skip-browser-warning': 'true'  
       }
     });
     
@@ -392,6 +395,7 @@ async function createNewChatSession() {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${authToken}`,
+        'ngrok-skip-browser-warning': 'true',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
@@ -434,6 +438,7 @@ async function saveChatMessage(text, isUser, source = null) {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${authToken}`,
+        'ngrok-skip-browser-warning': 'true',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
@@ -462,7 +467,8 @@ async function clearCurrentChat() {
     const response = await fetch(`${API_BASE_URL}/chat/clear/${currentSessionId}`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${authToken}`
+        'Authorization': `Bearer ${authToken}`,
+        'ngrok-skip-browser-warning': 'true'
       }
     });
     
@@ -662,6 +668,7 @@ async function initModels() {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${authToken}`,
+        'ngrok-skip-browser-warning': 'true',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
