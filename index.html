@@ -1181,17 +1181,17 @@ details[open] .settings-toggle::after {
       </div>
 
       <!-- Chat Sessions Sidebar -->
-      <details class="section" open>
-        <summary class="section-title settings-toggle" aria-label="Chat sessions. Click to collapse">
-          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
-          </svg>
-          Chat Sessions
-        </summary>
-        <div id="chatSessionsSidebar" class="chat-sessions-sidebar" role="list" aria-label="Your chat sessions">
-          <div class="no-sessions">No chat sessions yet. Click "NEW CHAT" to start!</div>
-        </div>
-      </details>
+      <details class="section">
+      <summary class="section-title settings-toggle" aria-label="Previous chat sessions. Click to expand">
+        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+        </svg>
+        Previous Chat Sessions (Click to expand)
+      </summary>
+      <div id="chatSessionsSidebar" class="chat-sessions-sidebar" role="list" aria-label="Your chat sessions">
+        <div class="no-sessions">No chat sessions yet. Click "NEW CHAT" to start!</div>
+      </div>
+    </details>
 
       <!-- Chat History Section -->
       <div class="section" role="region" aria-label="Chat History">
