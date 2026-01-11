@@ -278,6 +278,15 @@ async function loadChatSessions() {
       }
     });
     
+    // Check if response is HTML (error page)
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      console.error('Server returned non-JSON response');
+      const text = await response.text();
+      console.error('Response:', text.substring(0, 200));
+      return;
+    }
+    
     const data = await response.json();
     
     if (data.status === 'success') {
@@ -288,6 +297,8 @@ async function loadChatSessions() {
       if (allChatSessions.length > 0 && !currentSessionId) {
         await loadChatSession(allChatSessions[0].id);
       }
+    } else {
+      console.error('Error from server:', data.message);
     }
     
   } catch (err) {
