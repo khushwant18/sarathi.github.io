@@ -351,6 +351,9 @@ async function loadChatSession(sessionId) {
     
     const data = await response.json();
     
+    console.log('📥 Loaded session data:', data); // ADD THIS
+    console.log('📝 Messages:', data.session?.messages); // ADD THIS
+    
     if (data.status === 'success') {
       currentSessionId = sessionId;
       
@@ -361,22 +364,13 @@ async function loadChatSession(sessionId) {
       
       chatMessages = data.session.messages || [];
       
+      console.log('💬 Chat messages array:', chatMessages); // ADD THIS
+      
       // Render messages
       chatMessages.forEach(msg => {
+        console.log('➡️ Rendering message:', msg); // ADD THIS
         addChatMessageToDOM(msg.text, msg.is_user, msg.source, false);
       });
-      
-      updateConversationCount();
-      renderChatSessions(); // Re-render to update active state
-      
-      announceStatus(`Loaded chat: ${data.session.title}`, true);
-    }
-    
-  } catch (err) {
-    console.error('Error loading chat session:', err);
-    announceStatus('Error loading chat session', true);
-  }
-}
 
 async function createNewChatSession() {
   try {
@@ -401,7 +395,7 @@ async function createNewChatSession() {
       chatHistory.innerHTML = '';
       if (welcomeMsg) chatHistory.appendChild(welcomeMsg);
       
-      chatMessages = [];
+      chatMessages = [];  // ✅ This is correct - you ARE clearing the array
       updateConversationCount();
       
       // Reload sessions
