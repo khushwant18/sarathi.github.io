@@ -1,27 +1,56 @@
 // API Configuration
 const API_BASE_URL = 'https://c64fe879a391.ngrok-free.app/api';
-// DOM Elements
+
+// Auth State
+let authToken = null;
+let currentUser = null;
+
+// DOM Elements - Auth
+const authPage = document.getElementById('authPage');
+const authForm = document.getElementById('authForm');
+const authTitle = document.getElementById('authTitle');
+const authSubmitBtn = document.getElementById('authSubmitBtn');
+const authSwitchBtn = document.getElementById('authSwitchBtn');
+const authSwitchText = document.getElementById('authSwitchText');
+const nameField = document.getElementById('nameField');
+const nameInput = document.getElementById('nameInput');
+const emailInput = document.getElementById('emailInput');
+const passwordInput = document.getElementById('passwordInput');
+const authError = document.getElementById('authError');
+const authSuccess = document.getElementById('authSuccess');
+const userInfoContainer = document.getElementById('userInfoContainer');
+const userName = document.getElementById('userName');
+const logoutButton = document.getElementById('logoutButton');
+
+// DOM Elements - Pages
 const classSelectionPage = document.getElementById('classSelectionPage');
 const assistantPage = document.getElementById('assistantPage');
 const breadcrumb = document.getElementById('breadcrumb');
 const breadcrumbText = document.getElementById('breadcrumbText');
+
+// DOM Elements - Controls
 const voiceButton = document.getElementById('voiceButton');
 const buttonText = document.getElementById('buttonText');
 const status = document.getElementById('status');
 const announcer = document.getElementById('announcer');
+const clearChatButton = document.getElementById('clearChatButton');
+const newChatButton = document.getElementById('newChatButton');
+
+// DOM Elements - Chat
 const chatHistory = document.getElementById('chatHistory');
 const conversationCount = document.getElementById('conversationCount');
-const clearChatButton = document.getElementById('clearChatButton');
+const chatSessionsSidebar = document.getElementById('chatSessionsSidebar');
 const audioEl = document.getElementById('audio');
 const speechRateSlider = document.getElementById('speechRate');
 const rateValue = document.getElementById('rateValue');
 const textInput = document.getElementById('textInput');
 const textSubmit = document.getElementById('textSubmit');
-let audioQueue = [];
-let isPlayingQueue = false;
 
 // State
+let isLoginMode = true;
 let chatMessages = [];
+let allChatSessions = [];
+let currentSessionId = null;
 let mediaRecorder = null;
 let audioChunks = [];
 let isRecording = false;
@@ -29,65 +58,431 @@ let audioContext = new AudioContext();
 let isProcessing = false;
 let currentResponse = '';
 let selectedBookJSON = null;
+let audioQueue = [];
+let isPlayingQueue = false;
 
-// Initialize page navigation
-document.addEventListener('DOMContentLoaded', function() {
-  const class6Button = document.getElementById('class6Button');
-  const class7Button = document.getElementById('class7Button');
-  const class9Button = document.getElementById('class9Button');
-  const class10Button = document.getElementById('class10Button');
-  const backToClassButton = document.getElementById('backToClassButton');
-  
-  async function showAssistantPage6() {
-    selectedBookJSON = 'NCERT6thbook.json';
-    classSelectionPage.classList.remove('active');
-    assistantPage.classList.add('active');
-    breadcrumb.classList.remove('hidden');
-    breadcrumbText.textContent = 'Home → Class 6 Science';
-    await initModels();
-  }
+// ============================================
+// AUTH FUNCTIONS
+// ============================================
 
-  
-  async function showAssistantPage7() {
-    selectedBookJSON = 'NCERT7thbook.json';
-    classSelectionPage.classList.remove('active');
-    assistantPage.classList.add('active');
-    breadcrumb.classList.remove('hidden');
-    breadcrumbText.textContent = 'Home → Class 7 Science';
-    await initModels();
-  }
+function showAuthError(message) {
+  authError.textContent = message;
+  authError.classList.remove('hidden');
+  authSuccess.classList.add('hidden');
+  announcer.textContent = `Error: ${message}`;
+}
 
-  async function showAssistantPage9() {
-    selectedBookJSON = 'NCERT9thbook.json';
-    classSelectionPage.classList.remove('active');
-    assistantPage.classList.add('active');
-    breadcrumb.classList.remove('hidden');
-    breadcrumbText.textContent = 'Home → Class 9 Science';
-    await initModels();
-  }
-  async function showAssistantPage10() {
-    selectedBookJSON = 'NCERT10thbook.json';
-    classSelectionPage.classList.remove('active');
-    assistantPage.classList.add('active');
-    breadcrumb.classList.remove('hidden');
-    breadcrumbText.textContent = 'Home → Class 10 Science';
-    await initModels();
-  }
+function showAuthSuccess(message) {
+  authSuccess.textContent = message;
+  authSuccess.classList.remove('hidden');
+  authError.classList.add('hidden');
+  announcer.textContent = message;
+}
+
+function hideAuthMessages() {
+  authError.classList.add('hidden');
+  authSuccess.classList.add('hidden');
+}
+
+function toggleAuthMode() {
+  isLoginMode = !isLoginMode;
   
-  function showClassSelectionPage() {
-    assistantPage.classList.remove('active');
-    classSelectionPage.classList.add('active');
-    breadcrumb.classList.add('hidden');
+  if (isLoginMode) {
+    authTitle.textContent = 'Login to Vidya Assist';
+    authSubmitBtn.textContent = 'LOGIN';
+    authSwitchText.textContent = "Don't have an account?";
+    authSwitchBtn.textContent = 'Register here';
+    nameField.classList.add('hidden');
+    nameInput.required = false;
+  } else {
+    authTitle.textContent = 'Register for Vidya Assist';
+    authSubmitBtn.textContent = 'REGISTER';
+    authSwitchText.textContent = 'Already have an account?';
+    authSwitchBtn.textContent = 'Login here';
+    nameField.classList.remove('hidden');
+    nameInput.required = true;
   }
   
-  if (class6Button) class6Button.addEventListener('click', showAssistantPage6);
-  if (class7Button) class7Button.addEventListener('click', showAssistantPage7);
-  if (class9Button) class9Button.addEventListener('click', showAssistantPage9);
-  if (class10Button) class10Button.addEventListener('click', showAssistantPage10);
-  if (backToClassButton) backToClassButton.addEventListener('click', showClassSelectionPage);
-});
+  hideAuthMessages();
+  authForm.reset();
+}
 
-// Utility Functions
+async function handleAuthSubmit(e) {
+  e.preventDefault();
+  hideAuthMessages();
+  
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
+  const name = nameInput.value.trim();
+  
+  if (!email || !password) {
+    showAuthError('Please fill in all required fields');
+    return;
+  }
+  
+  if (!isLoginMode && !name) {
+    showAuthError('Please enter your name');
+    return;
+  }
+  
+  authSubmitBtn.disabled = true;
+  authSubmitBtn.textContent = isLoginMode ? 'LOGGING IN...' : 'REGISTERING...';
+  
+  try {
+    const endpoint = isLoginMode ? '/auth/login' : '/auth/register';
+    const body = isLoginMode 
+      ? { email, password }
+      : { email, password, name };
+    
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body)
+    });
+    
+    const data = await response.json();
+    
+    if (data.status === 'success') {
+      authToken = data.token;
+      currentUser = data.user;
+      localStorage.setItem('authToken', authToken);
+      localStorage.setItem('currentUser', JSON.stringify(currentUser));
+      
+      showAuthSuccess(data.message);
+      
+      // Navigate to class selection after brief delay
+      setTimeout(() => {
+        showClassSelectionPage();
+      }, 1000);
+      
+    } else {
+      showAuthError(data.message);
+    }
+    
+  } catch (err) {
+    console.error('Auth error:', err);
+    showAuthError('Connection error. Please check your internet connection.');
+  } finally {
+    authSubmitBtn.disabled = false;
+    authSubmitBtn.textContent = isLoginMode ? 'LOGIN' : 'REGISTER';
+  }
+}
+
+async function verifyAuth() {
+  const token = localStorage.getItem('authToken');
+  const user = localStorage.getItem('currentUser');
+  
+  if (!token || !user) {
+    return false;
+  }
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/auth/verify`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    
+    const data = await response.json();
+    
+    if (data.status === 'success') {
+      authToken = token;
+      currentUser = data.user;
+      return true;
+    } else {
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('currentUser');
+      return false;
+    }
+    
+  } catch (err) {
+    console.error('Auth verification error:', err);
+    return false;
+  }
+}
+
+async function handleLogout() {
+  try {
+    await fetch(`${API_BASE_URL}/auth/logout`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${authToken}`
+      }
+    });
+  } catch (err) {
+    console.error('Logout error:', err);
+  }
+  
+  authToken = null;
+  currentUser = null;
+  localStorage.removeItem('authToken');
+  localStorage.removeItem('currentUser');
+  
+  // Reset state
+  chatMessages = [];
+  allChatSessions = [];
+  currentSessionId = null;
+  selectedBookJSON = null;
+  
+  // Show auth page
+  assistantPage.classList.remove('active');
+  classSelectionPage.classList.remove('active');
+  authPage.classList.add('active');
+  breadcrumb.classList.add('hidden');
+  userInfoContainer.classList.add('hidden');
+  
+  announceStatus('Logged out successfully', true);
+}
+
+// ============================================
+// PAGE NAVIGATION
+// ============================================
+
+function showClassSelectionPage() {
+  authPage.classList.remove('active');
+  assistantPage.classList.remove('active');
+  classSelectionPage.classList.add('active');
+  breadcrumb.classList.add('hidden');
+  
+  // Update user info
+  if (currentUser) {
+    userName.textContent = `Welcome, ${currentUser.name}!`;
+    userInfoContainer.classList.remove('hidden');
+  }
+}
+
+async function showAssistantPage(bookJSON, bookTitle) {
+  selectedBookJSON = bookJSON;
+  classSelectionPage.classList.remove('active');
+  assistantPage.classList.add('active');
+  breadcrumb.classList.remove('hidden');
+  breadcrumbText.textContent = `Home → ${bookTitle}`;
+  
+  await initModels();
+  await loadChatSessions();
+}
+
+// ============================================
+// CHAT SESSION FUNCTIONS
+// ============================================
+
+async function loadChatSessions() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/chat/sessions`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${authToken}`
+      }
+    });
+    
+    const data = await response.json();
+    
+    if (data.status === 'success') {
+      allChatSessions = data.sessions.filter(s => s.book === selectedBookJSON);
+      renderChatSessions();
+      
+      // Load most recent session if available
+      if (allChatSessions.length > 0 && !currentSessionId) {
+        await loadChatSession(allChatSessions[0].id);
+      }
+    }
+    
+  } catch (err) {
+    console.error('Error loading chat sessions:', err);
+  }
+}
+
+function renderChatSessions() {
+  if (allChatSessions.length === 0) {
+    chatSessionsSidebar.innerHTML = '<div class="no-sessions">No chat sessions yet. Click "NEW CHAT" to start!</div>';
+    return;
+  }
+  
+  chatSessionsSidebar.innerHTML = '';
+  
+  allChatSessions.forEach((session, index) => {
+    const sessionDiv = document.createElement('div');
+    sessionDiv.className = `chat-session-item ${session.id === currentSessionId ? 'active' : ''}`;
+    sessionDiv.setAttribute('tabindex', '0');
+    sessionDiv.setAttribute('role', 'button');
+    sessionDiv.setAttribute('aria-label', `Chat session: ${session.title}. ${session.message_count} messages. Click to load.`);
+    
+    if (session.id === currentSessionId) {
+      sessionDiv.setAttribute('aria-current', 'true');
+    }
+    
+    const title = document.createElement('div');
+    title.className = 'chat-session-title';
+    title.textContent = session.title;
+    title.setAttribute('aria-hidden', 'true');
+    
+    const meta = document.createElement('div');
+    meta.className = 'chat-session-meta';
+    const date = new Date(session.last_message_at || session.created_at);
+    meta.textContent = `${session.message_count} messages • ${date.toLocaleDateString()}`;
+    meta.setAttribute('aria-hidden', 'true');
+    
+    sessionDiv.appendChild(title);
+    sessionDiv.appendChild(meta);
+    
+    sessionDiv.addEventListener('click', () => loadChatSession(session.id));
+    sessionDiv.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        loadChatSession(session.id);
+      }
+    });
+    
+    chatSessionsSidebar.appendChild(sessionDiv);
+  });
+}
+
+async function loadChatSession(sessionId) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/chat/session/${sessionId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${authToken}`
+      }
+    });
+    
+    const data = await response.json();
+    
+    if (data.status === 'success') {
+      currentSessionId = sessionId;
+      
+      // Clear current chat
+      const welcomeMsg = chatHistory.querySelector('.welcome-chat-message');
+      chatHistory.innerHTML = '';
+      if (welcomeMsg) chatHistory.appendChild(welcomeMsg);
+      
+      chatMessages = data.session.messages || [];
+      
+      // Render messages
+      chatMessages.forEach(msg => {
+        addChatMessageToDOM(msg.text, msg.is_user, msg.source, false);
+      });
+      
+      updateConversationCount();
+      renderChatSessions(); // Re-render to update active state
+      
+      announceStatus(`Loaded chat: ${data.session.title}`, true);
+    }
+    
+  } catch (err) {
+    console.error('Error loading chat session:', err);
+    announceStatus('Error loading chat session', true);
+  }
+}
+
+async function createNewChatSession() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/chat/new`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${authToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        book: selectedBookJSON
+      })
+    });
+    
+    const data = await response.json();
+    
+    if (data.status === 'success') {
+      currentSessionId = data.session.id;
+      
+      // Clear chat
+      const welcomeMsg = chatHistory.querySelector('.welcome-chat-message');
+      chatHistory.innerHTML = '';
+      if (welcomeMsg) chatHistory.appendChild(welcomeMsg);
+      
+      chatMessages = [];
+      updateConversationCount();
+      
+      // Reload sessions
+      await loadChatSessions();
+      
+      announceStatus('New chat session started', true);
+    }
+    
+  } catch (err) {
+    console.error('Error creating chat session:', err);
+    announceStatus('Error creating new chat', true);
+  }
+}
+
+async function saveChatMessage(text, isUser, source = null) {
+  if (!currentSessionId) {
+    await createNewChatSession();
+  }
+  
+  try {
+    await fetch(`${API_BASE_URL}/chat/message`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${authToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        session_id: currentSessionId,
+        text: text,
+        is_user: isUser,
+        source: source
+      })
+    });
+    
+    // Refresh sessions to update counts
+    await loadChatSessions();
+    
+  } catch (err) {
+    console.error('Error saving message:', err);
+  }
+}
+
+async function clearCurrentChat() {
+  if (!currentSessionId) {
+    announceStatus('No active chat to clear', true);
+    return;
+  }
+  
+  try {
+    const response = await fetch(`${API_BASE_URL}/chat/clear/${currentSessionId}`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${authToken}`
+      }
+    });
+    
+    const data = await response.json();
+    
+    if (data.status === 'success') {
+      const welcomeMsg = chatHistory.querySelector('.welcome-chat-message');
+      chatHistory.innerHTML = '';
+      if (welcomeMsg) chatHistory.appendChild(welcomeMsg);
+      
+      chatMessages = [];
+      updateConversationCount();
+      
+      await loadChatSessions();
+      
+      announceStatus('Chat cleared successfully', true);
+    }
+    
+  } catch (err) {
+    console.error('Error clearing chat:', err);
+    announceStatus('Error clearing chat', true);
+  }
+}
+
+// ============================================
+// UTILITY FUNCTIONS
+// ============================================
+
 function updateConversationCount() {
   const count = chatMessages.length;
   conversationCount.textContent = count === 1 ? '1 message' : `${count} messages`;
@@ -106,12 +501,11 @@ async function announceStatus(message, speak = false) {
 async function speakText(text) {
   try {
     const sentences = text
-      .replace(/(\d+)\.\s*(\d+)/g, '$1DECIMALDOT$2') // Protect decimal numbers
-      .replace(/(\d+)\.\s+/g, '$1LISTDOT ') // Protect numbered lists
+      .replace(/(\d+)\.\s*(\d+)/g, '$1DECIMALDOT$2')
+      .replace(/(\d+)\.\s+/g, '$1LISTDOT ')
       .match(/[^.!?]+[.!?]+(?=\s|$)/g) || [text];
     
     for (let sentence of sentences) {
-      // Restore protected decimals and list numbers
       sentence = sentence
         .replace(/DECIMALDOT/g, '.')
         .replace(/LISTDOT/g, '.')
@@ -161,52 +555,40 @@ async function queueSentenceForTTS(sentence) {
 }
 
 async function playAudioQueue() {
-  console.log('🎵 playAudioQueue called, queue length:', audioQueue.length);
-  
   if (audioQueue.length === 0) {
     isPlayingQueue = false;
-    console.log('Queue empty, stopping');
     return;
   }
   
   isPlayingQueue = true;
   const audioItem = audioQueue.shift();
   
-  console.log('🔊 Playing audio for:', audioItem.text);
-  console.log('Blob size:', audioItem.blob.size, 'bytes');
-  console.log('Blob type:', audioItem.blob.type);
-  
   const audioURL = URL.createObjectURL(audioItem.blob);
-  console.log('Audio URL created:', audioURL);
   
   audioEl.src = audioURL;
   audioEl.playbackRate = parseFloat(speechRateSlider.value);
   
   audioEl.onended = () => {
-    console.log('✅ Audio ended');
     URL.revokeObjectURL(audioURL);
     playAudioQueue();
   };
 
   audioEl.onerror = (e) => {
-    console.error('❌ Audio element error:', e);
-    console.error('Audio element error details:', audioEl.error);
+    console.error('Audio element error:', e);
     URL.revokeObjectURL(audioURL);
     playAudioQueue();
   };
   
   try {
-    console.log('Attempting to play...');
     await audioEl.play();
-    console.log('✅ Play successful');
   } catch (e) {
-    console.error('❌ Play failed:', e);
+    console.error('Play failed:', e);
     URL.revokeObjectURL(audioURL);
     playAudioQueue();
   }
 }
 
-async function addChatMessage(text, isUser, source = null) {
+function addChatMessageToDOM(text, isUser, source = null, scrollToView = true) {
   const messageDiv = document.createElement('div');
   messageDiv.className = `chat-message ${isUser ? 'chat-message-user' : 'chat-message-assistant'}`;
   messageDiv.setAttribute('tabindex', '0');
@@ -244,24 +626,26 @@ async function addChatMessage(text, isUser, source = null) {
   messageDiv.appendChild(meta);
   
   chatHistory.appendChild(messageDiv);
-  messageDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
   
-  chatMessages.push({ text, isUser, source, timestamp });
-  updateConversationCount();
-}
-
-async function clearChatHistory() {
-  const welcomeMessage = chatHistory.querySelector('.welcome-chat-message');
-  chatHistory.innerHTML = '';
-  if (welcomeMessage) {
-    chatHistory.appendChild(welcomeMessage);
+  if (scrollToView) {
+    messageDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }
-  chatMessages = [];
-  updateConversationCount();
-  await announceStatus('Chat history cleared.', true);
 }
 
-// API Functions
+async function addChatMessage(text, isUser, source = null) {
+  addChatMessageToDOM(text, isUser, source, true);
+  
+  chatMessages.push({ text, is_user: isUser, source, timestamp: new Date() });
+  updateConversationCount();
+  
+  // Save to database
+  await saveChatMessage(text, isUser, source);
+}
+
+// ============================================
+// API FUNCTIONS
+// ============================================
+
 async function initModels() {
   try {
     announceStatus('Loading models...');
@@ -269,6 +653,7 @@ async function initModels() {
     const response = await fetch(`${API_BASE_URL}/init`, {
       method: 'POST',
       headers: {
+        'Authorization': `Bearer ${authToken}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -298,7 +683,6 @@ async function transcribeAudio(audioBlob) {
   const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
   const audioData = audioBuffer.getChannelData(0);
   
-  // Convert to base64
   const audioBase64 = btoa(String.fromCharCode(...new Uint8Array(audioData.buffer)));
   
   const response = await fetch(`${API_BASE_URL}/transcribe`, {
@@ -359,7 +743,10 @@ async function generateAnswer(query, context, searchResults) {
   }
 }
 
-// Recording Functions
+// ============================================
+// RECORDING FUNCTIONS
+// ============================================
+
 async function startRecording() {
   try {
     announceStatus('Requesting microphone access...', true);
@@ -535,12 +922,49 @@ async function handleTextSubmit() {
 }
 
 async function announceHelp() {
-  const helpMessage = "Voice Assistant Help. Press Space to record your question. Press Enter to submit text questions. Press Control Delete to clear chat history. Press Escape to return to home. Press Control H for help.";
+  const helpMessage = "Voice Assistant Help. Press Space to record your question. Press Enter to submit text questions. Press Control N for new chat. Press Control Delete to clear chat. Press Escape to return to home. Press Control H for help.";
   announceStatus(helpMessage, true);
 }
 
-// Event Listeners
-voiceButton.addEventListener('click', async () => {
+// ============================================
+// EVENT LISTENERS
+// ============================================
+
+// Auth events
+authForm.addEventListener('submit', handleAuthSubmit);
+authSwitchBtn.addEventListener('click', toggleAuthMode);
+logoutButton.addEventListener('click', handleLogout);
+
+// Class selection events
+document.getElementById('class6Button')?.addEventListener('click', () => {
+  showAssistantPage('NCERT6thbook.json', 'Class 6 Science');
+});
+
+document.getElementById('class7Button')?.addEventListener('click', () => {
+  showAssistantPage('NCERT7thbook.json', 'Class 7 Science');
+});
+
+document.getElementById('class9Button')?.addEventListener('click', () => {
+  showAssistantPage('NCERT9thbook.json', 'Class 9 Science');
+});
+
+document.getElementById('class10Button')?.addEventListener('click', () => {
+  showAssistantPage('NCERT10thbook.json', 'Class 10 Science');
+});
+
+document.getElementById('backToClassButton')?.addEventListener('click', () => {
+  assistantPage.classList.remove('active');
+  classSelectionPage.classList.add('active');
+  breadcrumb.classList.add('hidden');
+  selectedBookJSON = null;
+  currentSessionId = null;
+});
+
+// Chat control events
+newChatButton?.addEventListener('click', createNewChatSession);
+clearChatButton?.addEventListener('click', clearCurrentChat);
+
+voiceButton?.addEventListener('click', async () => {
   if (isProcessing) {
     announceStatus('Please wait for processing to complete.', true);
     return;
@@ -553,29 +977,38 @@ voiceButton.addEventListener('click', async () => {
   }
 });
 
-clearChatButton.addEventListener('click', clearChatHistory);
-textSubmit.addEventListener('click', handleTextSubmit);
+textSubmit?.addEventListener('click', handleTextSubmit);
 
-textInput.addEventListener('keydown', (e) => {
+textInput?.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') {
     e.preventDefault();
     handleTextSubmit();
   }
 });
 
-speechRateSlider.addEventListener('input', (e) => {
+speechRateSlider?.addEventListener('input', (e) => {
   const rate = parseFloat(e.target.value);
   rateValue.textContent = rate.toFixed(1);
 });
 
+// Keyboard shortcuts
 document.addEventListener('keydown', (e) => {
-  if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'SUMMARY') {
+  // Don't trigger shortcuts when in auth forms
+  if (authPage.classList.contains('active') && e.target.tagName === 'INPUT') {
+    return;
+  }
+  
+  if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'SUMMARY' && e.target.tagName !== 'BUTTON') {
     e.preventDefault();
-    voiceButton.click();
+    voiceButton?.click();
+  }
+  else if (e.code === 'KeyN' && e.ctrlKey) {
+    e.preventDefault();
+    newChatButton?.click();
   }
   else if (e.code === 'KeyR' && e.ctrlKey) {
     e.preventDefault();
-    const lastAssistantMessage = chatMessages.filter(m => !m.isUser).pop();
+    const lastAssistantMessage = chatMessages.filter(m => !m.is_user).pop();
     if (lastAssistantMessage) {
       announceStatus('Repeating last response...', true);
       setTimeout(() => {
@@ -587,14 +1020,46 @@ document.addEventListener('keydown', (e) => {
   }
   else if (e.code === 'Delete' && e.ctrlKey) {
     e.preventDefault();
-    clearChatHistory();
+    clearCurrentChat();
   }
   else if (e.code === 'Escape') {
     e.preventDefault();
-    document.getElementById('backToClassButton').click();
+    if (assistantPage.classList.contains('active')) {
+      document.getElementById('backToClassButton')?.click();
+    }
   }
   else if (e.code === 'KeyH' && e.ctrlKey) {
     e.preventDefault();
     announceHelp();
   }
 });
+
+// Help buttons
+document.getElementById('classHelpButton')?.addEventListener('click', () => {
+  const helpMsg = "Class selection page. Choose a class to start learning. Press Control H for help anytime.";
+  announceStatus(helpMsg, true);
+});
+
+document.getElementById('assistantHelpButton')?.addEventListener('click', announceHelp);
+
+// ============================================
+// INITIALIZATION
+// ============================================
+
+async function init() {
+  console.log('🚀 Initializing Vidya Assist...');
+  
+  // Check if user is already authenticated
+  const isAuthenticated = await verifyAuth();
+  
+  if (isAuthenticated) {
+    console.log('✅ User authenticated:', currentUser.email);
+    showClassSelectionPage();
+  } else {
+    console.log('🔐 User not authenticated, showing login');
+    authPage.classList.add('active');
+  }
+}
+
+// Start the app
+init();
